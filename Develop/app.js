@@ -14,75 +14,75 @@ const employees = [];
 
 // Capture information about all employees on the team
 async function getInput() {
+
+  async function doPrompt(promptType, promptMsg, promptChoices) {
+    return inquirer.prompt([{
+      type: promptType,
+      name: "data",
+      message: promptMsg,
+      choices: promptChoices
+    }]);
+  };
+
+  // Get email address. Verify that it is valid, but only once, then allow
+  async function validateEmail(promptMsg) {
+    let email = await doPrompt("input", promptMsg);
+    let pos = email.data.indexOf("@");
+    if ((pos === -1) || (email.data.lastIndexOf(".") < pos)) {
+      email = await doPrompt("input", "Invalid format. Please re-enter email address:");
+    };
+    return email;
+  };
+
   let keepGoing = true;
 
   console.log("\n *** Welcome to the Team Page Generator *** \n");
 
+  // Get manager name, and make sure it isn't blank
+  let resName = await doPrompt("input", "What is your name?");
+  if (resName.data.trim() === "") {
+    let resName = await doPrompt("input", "Your name cannot be blank. Please enter your name:");
+    if (resName.data.trim() === "") {
+      return false; // If name still blank, then exit
+    };
+  };
+
+  // Get manager's ID, email, and office number. Only need to validate email address
+  let resId = await doPrompt("input", "What is your employee ID?");
+  let resEmail = await validateEmail("What is your email address?");
+  let resNum = await doPrompt("input", "What is your office number?");
+
+  // Add manager to employees array. Assume that they are adding at least one employee
+  employees.push(new Manager(resName.data, resId.data, resEmail.data, resNum.data));
+
   while (keepGoing) {
-    let resName = await inquirer.prompt([{
-      type: "input",
-      name: "employeeName",
-      message: "What is the employee's name?"
-    }]);
+    console.log('\n');
 
-    let resId = await inquirer.prompt([{
-      type: "number",
-      name: "employeeId",
-      message: "What is the employee's ID?"
-    }]);
+    // Get next employee name, if blank, skip to prompt
+    let resName = await doPrompt("input", "What is the employee's name?");
+    if (resName.data.trim() != "") {
+      let resId = await doPrompt("input", "What is the employee's ID?");
+      let resEmail = await validateEmail("What is the employee's email address?");
+      let resType = await doPrompt("list", `What type of employee is ${resName.data}?`, ["Engineer", "Intern"]);
 
-    let resEmail = await inquirer.prompt([{
-      type: "input",
-      name: "employeeEmail",
-      message: "What is the employee's email address?"
-    }]);
-
-    let resType = await inquirer.prompt([{
-      type: "list",
-      name: "employeeType",
-      message: `What type of employee is ${resName.employeeName}?`,
-      choices: ["Manager", "Engineer", "Intern"]
-    }]);
-
-    switch(resType.employeeType) {
-      case "Manager":
-        let resNum = await inquirer.prompt([{
-          type: "number",
-          name: "officeNum",
-          message: "What is this manager's office number?"
-        }]);
-        employees.push(new Manager(resName.employeeName, resId.employeeId, 
-          resEmail.employeeEmail, resNum.officeNum));
-        break;
-      case "Engineer":
-        let resGithub = await inquirer.prompt([{
-          type: "input",
-          name: "gitHub",
-          message: "What is this engineer's GitHub user name?"
-        }]);
-        employees.push(new Engineer(resName.employeeName, resId.employeeId, 
-          resEmail.employeeEmail, resGithub.gitHub));
-        break;
-      case "Intern":
-        let resSchool = await inquirer.prompt([{
-          type: "input",
-          name: "school",
-          message: "What is this intern's school name?"
-        }]);
-        employees.push(new Intern(resName.employeeName, resId.employeeId, 
-          resEmail.employeeEmail, resSchool.school));
-        break;
-    }
-
-    let resContinue = await inquirer.prompt([{
-      type: "confirm",
-      name: "confirmMore",
-      message: "Add another employee?"
-    }]);
+      // If intern, prompt for school, otherwise prompt for GitHub name; then add to employees array
+      if (resType.data === "Intern") {
+        let resSchool = await doPrompt("input", "What is this intern's school name?");
+        employees.push(new Intern(resName.data, resId.data, resEmail.data, resSchool.data));
+      }
+      else {
+        let resGithub = await doPrompt("input", "What is this engineer's GitHub user name?");
+        employees.push(new Engineer(resName.data, resId.data, resEmail.data, resGithub.data));
+      }
+    };
 
     console.log('\n');
-    keepGoing = resContinue.confirmMore;
+    
+    let resContinue = await doPrompt("confirm", "Add another employee?");
+
+    keepGoing = resContinue.data;
   }
+  console.log(employees); // TODO: just for testing
 };
 
 getInput();
