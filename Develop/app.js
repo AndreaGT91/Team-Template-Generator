@@ -8,23 +8,24 @@ const Intern = require("./lib/Intern");
 const render = require("./lib/htmlRenderer");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
-const outputPath = path.join(OUTPUT_DIR, "team.html");
+let outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const employees = [];
+
+// Function that does actually prompting
+async function doPrompt(promptType, promptMsg, promptChoices) {
+  return inquirer.prompt([{
+    type: promptType,
+    name: "data",
+    message: promptMsg,
+    choices: promptChoices
+  }]);
+};
 
 // Capture information about all employees on the team
 async function getInput() {
 
-  async function doPrompt(promptType, promptMsg, promptChoices) {
-    return inquirer.prompt([{
-      type: promptType,
-      name: "data",
-      message: promptMsg,
-      choices: promptChoices
-    }]);
-  };
-
-  // Get email address. Verify that it is valid, but only once, then allow
+  // Local function to get email address. Verify that it is valid, but only once, then allow
   async function validateEmail(promptMsg) {
     let email = await doPrompt("input", promptMsg);
     let pos = email.data.indexOf("@");
@@ -35,8 +36,6 @@ async function getInput() {
   };
 
   let keepGoing = true;
-
-  console.log("\n *** Welcome to the Team Page Generator *** \n");
 
   // Get manager name, and make sure it isn't blank
   let resName = await doPrompt("input", "What is your name?");
@@ -77,15 +76,64 @@ async function getInput() {
     };
 
     console.log('\n');
-    
+
     let resContinue = await doPrompt("confirm", "Add another employee?");
 
     keepGoing = resContinue.data;
-  }
-  console.log(employees); // TODO: just for testing
+  };
+  return true
 };
 
-getInput();
+async function doIt() {
+  console.log("\n *** Welcome to the Team Page Generator *** \n");
+
+  // Get user input, create list of employees
+  let result = await getInput();
+  console.log("Result: ", result);
+  console.log("# employees: ", employees.length);
+  if (result && (employees.length > 0)) {
+  // if (getInput() && (employees.length > 0)) {
+      let teamPage = render(employees);
+    
+    // If output directory does not exist, create it
+    if (!fs.existsSync(OUTPUT_DIR)) {
+      fs.mkdirSync(OUTPUT_DIR);
+    };
+
+    // See if output file exists; if so, prompt for overwrite; if no, enter new filename
+    let outputReady = false;
+
+    while (!outputReady) {
+      if (fs.existsSync(outputPath)) {
+        let confirmOverwrite = await doPrompt("confirm", `${outputPath} already exists. Overwrite?`)
+        if (confirmOverwrite.data) {
+          outputReady = true;
+        }
+        else {
+          let newFilename = await doPrompt("input", "Enter new html file name:");
+          let parseName = path.parse(newFilename.data).name.trim();
+          if ((newFilename) && (parseName != "")) { 
+            outputPath = path.join(OUTPUT_DIR, `${parseName}.html`);
+          }
+          else {
+            return // User didn't enter valid alternate name, just give up
+          };
+        };
+      }
+      else {
+        outputReady = true;
+      };
+    };
+
+    fs.writeFile(outputPath, teamPage, (err) => {
+      if (err) throw err;
+      console.log(`${outputPath} has been saved.`);
+      console.log("\n *** Thank you for using the Team Page Generator! *** \n");
+    });
+  };
+};
+
+doIt();
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
