@@ -88,11 +88,7 @@ async function doIt() {
   console.log("\n *** Welcome to the Team Page Generator *** \n");
 
   // Get user input, create list of employees
-  let result = await getInput();
-  console.log("Result: ", result);
-  console.log("# employees: ", employees.length);
-  if (result && (employees.length > 0)) {
-  // if (getInput() && (employees.length > 0)) {
+  if ((await getInput()) && (employees.length > 0)) {
       let teamPage = render(employees);
     
     // If output directory does not exist, create it
