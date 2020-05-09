@@ -11,8 +11,9 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 let outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const employees = [];
+let teamName = "My Team";
 
-// Function that does actually prompting
+// Function that does actual prompting
 async function doPrompt(promptType, promptMsg, promptChoices) {
   return inquirer.prompt([{
     type: promptType,
@@ -46,10 +47,14 @@ async function getInput() {
     };
   };
 
-  // Get manager's ID, email, and office number. Only need to validate email address
+  // Get team name and manager's ID, email, and office number. Only need to validate email address
+  let resTeam = await doPrompt("input", "What is your team name?");
   let resId = await doPrompt("input", "What is your employee ID?");
   let resEmail = await validateEmail("What is your email address?");
   let resNum = await doPrompt("input", "What is your office number?");
+
+  // Set global teamName to entered value
+  teamName = resTeam.data;
 
   // Add manager to employees array. Assume that they are adding at least one employee
   employees.push(new Manager(resName.data, resId.data, resEmail.data, resNum.data));
@@ -84,12 +89,12 @@ async function getInput() {
   return true
 };
 
-async function doIt() {
+async function generatePage() {
   console.log("\n *** Welcome to the Team Page Generator *** \n");
 
   // Get user input, create list of employees
   if ((await getInput()) && (employees.length > 0)) {
-      let teamPage = render(employees);
+      let teamPage = render(employees, teamName);
     
     // If output directory does not exist, create it
     if (!fs.existsSync(OUTPUT_DIR)) {
@@ -129,24 +134,4 @@ async function doIt() {
   };
 };
 
-doIt();
-
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an 
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work!```
+generatePage();

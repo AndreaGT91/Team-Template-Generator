@@ -3,8 +3,13 @@ const fs = require("fs");
 
 const templatesDir = path.resolve(__dirname, "../templates");
 
-const render = employees => {
+const render = function(employees, teamName) {
   const html = [];
+  let titleStr = "My Team";
+
+  if ((typeof(teamName) === "string") && (teamName.length > 0)) {
+    titleStr = teamName;
+  }
 
   html.push(employees
     .filter(employee => employee.getRole() === "Manager")
@@ -19,7 +24,7 @@ const render = employees => {
     .map(intern => renderIntern(intern))
   );
 
-  return renderMain(html.join(""));
+  return renderMain(html.join(""), titleStr);
 
 };
 
@@ -53,8 +58,9 @@ const renderIntern = intern => {
   return template;
 };
 
-const renderMain = html => {
-  const template = fs.readFileSync(path.resolve(templatesDir, "main.html"), "utf8");
+const renderMain = function(html, titleStr) {
+  let template = fs.readFileSync(path.resolve(templatesDir, "main.html"), "utf8");
+  template = replacePlaceholders(template, "title", titleStr);
   return replacePlaceholders(template, "team", html);
 };
 
