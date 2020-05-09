@@ -1,5 +1,24 @@
 # Team-Template-Generator
-Creates a work team web page based on user input
+Creates a work team web page based on user input.
+
+## Functionality added beyond homework requirements:
+
+* Input validation
+  * Manager's name cannot be blank; if blank is entered twice, program exits
+  * Email addresses are checked for an '@' and a '.' after the '@'. If incorrect format, user is prompted once to correct, then second entry is accepted without validation
+  * After manager information is collected, program automatically prompts for next employee; if name is blank, the rest of the input questions are skipped, and user prompted to enter more employees
+* Output validation
+  * If 'output' directory does not exist, it is created
+  * If 'team.html' already exists, user is questioned on whether or not to overwrite
+  * If user chooses not to overwrite, user is prompted for new filename
+  * If alternate filename exists, user is prompted to overwrite
+* Additional features
+  * Added prompt for team name; this will be the page title and heading name
+  * Updated colors used in html to be more interesting
+  * Changed icons used for Manager and Engineer
+  * Added margin around cards for better spacing
+  * Made page mobile responsive
+
 
 
 # Unit 10 OOP Homework: Template Engine - Employee Summary
