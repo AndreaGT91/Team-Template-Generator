@@ -1,7 +1,29 @@
 # Team-Template-Generator
-Creates a work team web page based on user input.
+Creates a work team web page based on user input. Manager will enter his/her own information and a team name, then enter information for two types of employees: engineers and interns. When the manager is done adding team members, an html file is generated that displays the collected information.
 
-## Functionality added beyond homework requirements:
+## Table of Contents 
+* [Installation](#installation) 
+* [Usage](#usage) 
+* [Tests](#tests) 
+* [Additions](#additions)
+* [Questions](#questions) 
+* [Assignment](#assignment)
+
+## Installation 
+ `npm install` 
+
+## Usage 
+ `node app.js` 
+
+## Tests
+test/    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Employee.test.js    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Engineer.test.js    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Intern.test.js    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Manager.test.js
+ 
+## Additions
+Functionality added beyond homework requirements:
 
 * Input validation
   * Manager's name cannot be blank; if blank is entered twice, program exits
@@ -19,8 +41,11 @@ Creates a work team web page based on user input.
   * Added margin around cards for better spacing
   * Made page mobile responsive
 
+## Questions 
+ ![Andrea Bentley](https://avatars2.githubusercontent.com/u/58275699?v=4&s=48)  Andrea Bentley  (AndreaGT91)  [andrea@bentleytech.com](mailto:andrea@bentleytech.com)
 
 
+## Assignment
 # Unit 10 OOP Homework: Template Engine - Employee Summary
 
 One of the most important aspects of programming is writing code that is readable, reliable, and maintainable. Oftentimes, *how* we design our code is just as important as the code itself. In this homework assignment, your challenge is to build a Node CLI that takes in information about employees and generates an HTML webpage that displays summaries for each person. Since testing is a key piece in making code maintainable, you will also be ensuring that all unit tests pass.
